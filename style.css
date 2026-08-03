@@ -177,3 +177,27 @@ footer { text-align: center; padding: 34px 20px; color: var(--muted); }
   .card-body { padding: 4px 20px 26px; }
   .hero { min-height: auto; }
 }
+
+
+.secret-panel {
+  margin: 18px 0 8px;
+  padding: 10px 12px;
+  border: 1px dashed #f59e0b;
+  border-radius: 12px;
+  background: #fffaf0;
+  color: #7c4a03;
+  font-size: .86rem;
+  opacity: .72;
+}
+.secret-panel summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+.secret-message {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff7ed;
+  color: #3b2f19;
+}
+.secret-message p { margin: 6px 0; }

@@ -201,3 +201,42 @@ footer { text-align: center; padding: 34px 20px; color: var(--muted); }
   color: #3b2f19;
 }
 .secret-message p { margin: 6px 0; }
+
+/* v5: participant-facing sections */
+.card-body h3.section-heading {
+  margin-top: 1.6rem;
+}
+details.fold {
+  margin: 1rem 0 1.2rem;
+  border: 1px solid rgba(32, 56, 96, 0.16);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.72);
+  overflow: hidden;
+}
+details.fold summary {
+  cursor: pointer;
+  padding: 0.9rem 1rem;
+  font-weight: 700;
+  color: #203860;
+  list-style: none;
+}
+details.fold summary::-webkit-details-marker { display: none; }
+details.fold summary::after {
+  content: "＋";
+  float: right;
+  font-weight: 800;
+}
+details.fold[open] summary::after { content: "－"; }
+.fold-content {
+  padding: 0 1rem 1rem;
+}
+.notice {
+  padding: 0.9rem 1rem;
+  border-left: 4px solid #4b73b9;
+  background: rgba(75, 115, 185, 0.08);
+  border-radius: 10px;
+}
+.mystery-message code {
+  white-space: pre-wrap;
+  word-break: break-all;
+}

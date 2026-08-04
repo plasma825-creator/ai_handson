@@ -294,9 +294,10 @@ wangziang@example.com</code></pre>
   </main>
 
   <section class="success-screen" id="successScreen" hidden>
-    <div class="success-card">
+    <div class="success-card" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+      <button id="closeSuccess" class="success-close" type="button" aria-label="閉じる">×</button>
       <p class="eyebrow">ESCAPE COMPLETE</p>
-      <h2>おめでとう。脱出成功です。</h2>
+      <h2 id="successTitle">おめでとう。脱出成功です。</h2>
       <p>皆さんは、生成AIを使って、外国語の問い合わせから要点を整理し、限られた情報から新しいアイデアを形にし、前任者が残した業務ファイルを読み解くことができました。</p>
       <p>大切なのは、生成AIに仕事を丸投げすることではありません。何を知りたいのか、何を任せるのか、最後に何を確認するのかを、人間が考えながら使うことです。</p>
       <p>生成AIは、過酷な業務から脱出するための魔法ではありません。けれど、人間と一緒に考え、作業の見通しをよくし、次の一歩を踏み出しやすくしてくれる相棒です。</p>

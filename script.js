@@ -7,9 +7,10 @@ const successScreen = document.getElementById('successScreen');
 const escapeKeyword = document.getElementById('escapeKeyword');
 const escapeButton = document.getElementById('escapeButton');
 const escapeError = document.getElementById('escapeError');
+const closeSuccess = document.getElementById('closeSuccess');
 
 function storageKey(card) {
-  return `kakoku_done_${card.dataset.card}`;
+  return `kakoku_v9_done_${card.dataset.card}`;
 }
 
 function b64ToUtf8(base64) {
@@ -92,20 +93,61 @@ function normalizeKeyword(value) {
   return value.trim().replace(/\s+/g, '');
 }
 
-function tryEscape() {
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function scrollToTopSmooth(duration = 900) {
+  const startY = window.scrollY || document.documentElement.scrollTop;
+  if (startY === 0) return Promise.resolve();
+
+  return new Promise(resolve => {
+    const startTime = performance.now();
+
+    function step(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeInOutCubic(progress);
+      window.scrollTo(0, startY * (1 - eased));
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        window.scrollTo(0, 0);
+        resolve();
+      }
+    }
+
+    requestAnimationFrame(step);
+  });
+}
+
+function showSuccessCard() {
+  successScreen.hidden = false;
+  successScreen.classList.remove('show');
+  document.body.classList.add('escape-complete');
+  requestAnimationFrame(() => {
+    successScreen.classList.add('show');
+  });
+}
+
+function hideSuccessCard() {
+  successScreen.classList.remove('show');
+  document.body.classList.remove('escape-complete');
+  setTimeout(() => {
+    successScreen.hidden = true;
+  }, 180);
+}
+
+async function tryEscape() {
   const correctKeyword = b64ToUtf8(window.KAKOKU_KEYWORD_B64 || '');
   const input = normalizeKeyword(escapeKeyword.value);
   const correct = normalizeKeyword(correctKeyword);
 
   if (input === correct) {
     escapeError.hidden = true;
-    localStorage.setItem('kakoku_escaped', '1');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => {
-      successScreen.hidden = false;
-      successScreen.classList.add('show');
-      document.body.classList.add('escape-complete');
-    }, 260);
+    await scrollToTopSmooth(950);
+    showSuccessCard();
   } else {
     escapeError.hidden = false;
     escapeKeyword.focus();
@@ -121,6 +163,20 @@ if (escapeKeyword) {
   });
 }
 
+if (closeSuccess) {
+  closeSuccess.addEventListener('click', hideSuccessCard);
+}
+if (successScreen) {
+  successScreen.addEventListener('click', event => {
+    if (event.target === successScreen) hideSuccessCard();
+  });
+}
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && successScreen && !successScreen.hidden) {
+    hideSuccessCard();
+  }
+});
+
 document.getElementById('resetProgress').addEventListener('click', () => {
   missionCards.forEach(card => {
     localStorage.removeItem(storageKey(card));
@@ -129,6 +185,8 @@ document.getElementById('resetProgress').addEventListener('click', () => {
     if (check) check.checked = false;
   });
   localStorage.removeItem('kakoku_escaped');
+  localStorage.removeItem('kakoku_v8_escaped');
+  localStorage.removeItem('kakoku_v9_escaped');
   successScreen.hidden = true;
   successScreen.classList.remove('show');
   document.body.classList.remove('escape-complete');
@@ -137,10 +195,12 @@ document.getElementById('resetProgress').addEventListener('click', () => {
   updateProgress();
 });
 
-if (localStorage.getItem('kakoku_escaped') === '1') {
-  successScreen.hidden = false;
-  successScreen.classList.add('show');
-  document.body.classList.add('escape-complete');
+// 成功カードは、脱出ボタンで正解した時だけ表示する。
+// 以前のテスト時に保存された localStorage による自動表示は行わない。
+if (successScreen) {
+  successScreen.hidden = true;
+  successScreen.classList.remove('show');
 }
+document.body.classList.remove('escape-complete');
 
 updateProgress();

@@ -257,8 +257,31 @@ details.fold[open] summary::after { content: "－"; }
     linear-gradient(180deg, #fff, #fffbeb);
   border: 2px solid #f59e0b;
   box-shadow: 0 30px 80px rgba(15, 23, 42, .28);
+  position: relative;
   opacity: 0;
   transform: translateY(36px) scale(.98);
+}
+.success-close {
+  position: sticky;
+  top: 0;
+  float: right;
+  width: 42px;
+  height: 42px;
+  margin: -12px -12px 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(146, 64, 14, .12);
+  color: #92400e;
+  font-size: 1.6rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+.success-close:hover {
+  background: rgba(146, 64, 14, .2);
+}
+.success-screen:not(.show) .success-card {
+  animation: none;
 }
 .success-screen.show .success-card {
   animation: floatUp .72s cubic-bezier(.16, 1, .3, 1) forwards;

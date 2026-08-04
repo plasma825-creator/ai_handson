@@ -11,6 +11,13 @@ const slideHeader = document.querySelector('.slide-header');
 const lyricOverlay = document.getElementById('lyricOverlay');
 const lyricLine = document.getElementById('lyricLine');
 
+const IMAGE_COUNT = 21;
+const GROUP_SIZE = 3;
+const TITLE_MS = 3000;
+const SLIDE_MS = 6000;
+const FIN_MS = 5000;
+const FADE_MS = 850;
+
 const lyrics = [
   { time: 0.0, text: '金沢国際酪農大学旭台キャンパス唱歌' },
   { time: 3.0, text: '旭台に　朝ひらけ' },
@@ -27,19 +34,13 @@ const lyrics = [
   { time: 41.0, text: 'ラク大へ　いま一歩' },
   { time: 42.8, text: 'ラク大へ　いま一歩' },
   { time: 44.6, text: 'ラク大へ　いま一歩' },
-  { time: 46.3, text: 'ラク大へ　いま一歩' },
-  { time: 48.0, text: 'ラク大へ　いま一歩' }
+
+  // 歌詞を消すタイミング。必要に応じて 49.5 や 50.5 に調整してください。
+  { time: 50.0, text: '' }
 ];
 
 let currentLyricIndex = -1;
 let lyricRafId = null;
-
-const IMAGE_COUNT = 21;
-const GROUP_SIZE = 3;
-const TITLE_MS = 3000;
-const SLIDE_MS = 6000;
-const FIN_MS = 5000;
-const FADE_MS = 850;
 
 const imagePaths = Array.from({ length: IMAGE_COUNT }, (_, index) => {
   const num = String(index + 1).padStart(2, '0');
@@ -56,6 +57,7 @@ function showScene(scene) {
     item.classList.remove('active');
     if (item !== scene) item.hidden = true;
   });
+
   scene.hidden = false;
   requestAnimationFrame(() => scene.classList.add('active'));
 }
@@ -73,10 +75,10 @@ function renderSlide(index) {
     const img = document.createElement('img');
     img.src = path;
     img.alt = `MISSION 2 提出画像 ${index * GROUP_SIZE + slotIndex + 1}`;
+
     img.onerror = () => {
       slot.classList.add('missing');
-      slot.textContent = `${path}
-画像を配置してください`;
+      slot.textContent = `${path}\n画像を配置してください`;
       img.remove();
     };
 
@@ -96,6 +98,7 @@ function transitionToSlide(index) {
 
   setTimeout(() => {
     renderSlide(index);
+
     requestAnimationFrame(() => {
       imageGrid.classList.remove('is-fading');
       slideHeader.classList.remove('is-fading');
@@ -104,10 +107,11 @@ function transitionToSlide(index) {
 }
 
 function updateLyrics() {
-  if (!audio || !lyricLine) return;
+  if (!audio || !lyricOverlay || !lyricLine) return;
 
   const now = audio.currentTime;
   let nextIndex = lyrics.length - 1;
+
   for (let i = 0; i < lyrics.length; i += 1) {
     if (now < lyrics[i].time) {
       nextIndex = Math.max(0, i - 1);
@@ -118,9 +122,17 @@ function updateLyrics() {
   if (nextIndex !== currentLyricIndex) {
     currentLyricIndex = nextIndex;
     lyricOverlay.classList.remove('show');
+
     setTimeout(() => {
-      lyricLine.textContent = lyrics[currentLyricIndex].text;
-      lyricOverlay.classList.add('show');
+      const nextText = lyrics[currentLyricIndex].text;
+
+      if (nextText === '') {
+        lyricOverlay.classList.remove('show');
+        lyricLine.textContent = '';
+      } else {
+        lyricLine.textContent = nextText;
+        lyricOverlay.classList.add('show');
+      }
     }, 120);
   }
 
@@ -129,9 +141,24 @@ function updateLyrics() {
 
 function startLyrics() {
   currentLyricIndex = -1;
-  if (lyricRafId) cancelAnimationFrame(lyricRafId);
-  lyricOverlay.classList.add('show');
+
+  if (lyricRafId) {
+    cancelAnimationFrame(lyricRafId);
+  }
+
+  lyricLine.textContent = '';
+  lyricOverlay.classList.remove('show');
   updateLyrics();
+}
+
+function stopLyrics() {
+  if (lyricRafId) {
+    cancelAnimationFrame(lyricRafId);
+    lyricRafId = null;
+  }
+
+  lyricOverlay.classList.remove('show');
+  lyricLine.textContent = '';
 }
 
 function scheduleEnding() {
@@ -144,6 +171,7 @@ function scheduleEnding() {
 
   slides.forEach((_, index) => {
     if (index === 0) return;
+
     setTimeout(() => {
       showScene(slideScene);
       transitionToSlide(index);
@@ -155,13 +183,18 @@ function scheduleEnding() {
   }, TITLE_MS + SLIDE_MS * slides.length);
 
   setTimeout(() => {
-    if (!audio.paused) audio.pause();
+    stopLyrics();
+
+    if (!audio.paused) {
+      audio.pause();
+    }
   }, TITLE_MS + SLIDE_MS * slides.length + FIN_MS + 800);
 }
 
 startButton.addEventListener('click', async () => {
   startPanel.hidden = true;
   stage.hidden = false;
+
   try {
     audio.currentTime = 0;
     await audio.play();
@@ -169,6 +202,7 @@ startButton.addEventListener('click', async () => {
     // 音声再生に失敗してもスライドショーは開始する。
     console.warn('Audio playback failed:', error);
   }
+
   startLyrics();
   scheduleEnding();
 });

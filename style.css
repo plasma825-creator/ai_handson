@@ -360,3 +360,22 @@ footer { text-align: center; padding: 34px 20px; color: var(--muted); }
   color: #64748b;
   font-size: 0.92rem;
 }
+
+
+.ending-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #92400e;
+  color: #fff;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 12px 24px rgba(146, 64, 14, .22);
+}
+.ending-link:hover,
+.ending-link:focus-visible {
+  background: #78350f;
+}

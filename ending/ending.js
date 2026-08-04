@@ -8,6 +8,31 @@ const finScene = document.getElementById('finScene');
 const imageGrid = document.getElementById('imageGrid');
 const slideCounter = document.getElementById('slideCounter');
 const slideHeader = document.querySelector('.slide-header');
+const lyricOverlay = document.getElementById('lyricOverlay');
+const lyricLine = document.getElementById('lyricLine');
+
+const lyrics = [
+  { time: 0.0, text: '金沢国際酪農大学旭台キャンパス唱歌' },
+  { time: 3.0, text: '旭台に　朝ひらけ' },
+  { time: 6.0, text: '白き峰より　風は来る' },
+  { time: 9.5, text: '酪農の野に　牛は立ち' },
+  { time: 13.0, text: '学びの鐘は　今日も鳴る' },
+  { time: 17.0, text: '重き日々にも　灯をかかげ' },
+  { time: 21.0, text: '知恵をたずねて　道を行く' },
+  { time: 25.0, text: '過ぎしカコクを　越えながら' },
+  { time: 29.0, text: '明日の丘へ　歩み出す' },
+  { time: 33.0, text: 'ああ　金沢国際酪農大学' },
+  { time: 36.0, text: '旭台キャンパス' },
+  { time: 38.5, text: 'われらは進む　ラク大へ' },
+  { time: 41.0, text: 'ラク大へ　いま一歩' },
+  { time: 42.8, text: 'ラク大へ　いま一歩' },
+  { time: 44.6, text: 'ラク大へ　いま一歩' },
+  { time: 46.3, text: 'ラク大へ　いま一歩' },
+  { time: 48.0, text: 'ラク大へ　いま一歩' }
+];
+
+let currentLyricIndex = -1;
+let lyricRafId = null;
 
 const IMAGE_COUNT = 21;
 const GROUP_SIZE = 3;
@@ -78,6 +103,37 @@ function transitionToSlide(index) {
   }, FADE_MS);
 }
 
+function updateLyrics() {
+  if (!audio || !lyricLine) return;
+
+  const now = audio.currentTime;
+  let nextIndex = lyrics.length - 1;
+  for (let i = 0; i < lyrics.length; i += 1) {
+    if (now < lyrics[i].time) {
+      nextIndex = Math.max(0, i - 1);
+      break;
+    }
+  }
+
+  if (nextIndex !== currentLyricIndex) {
+    currentLyricIndex = nextIndex;
+    lyricOverlay.classList.remove('show');
+    setTimeout(() => {
+      lyricLine.textContent = lyrics[currentLyricIndex].text;
+      lyricOverlay.classList.add('show');
+    }, 120);
+  }
+
+  lyricRafId = requestAnimationFrame(updateLyrics);
+}
+
+function startLyrics() {
+  currentLyricIndex = -1;
+  if (lyricRafId) cancelAnimationFrame(lyricRafId);
+  lyricOverlay.classList.add('show');
+  updateLyrics();
+}
+
 function scheduleEnding() {
   showScene(titleScene);
 
@@ -113,5 +169,6 @@ startButton.addEventListener('click', async () => {
     // 音声再生に失敗してもスライドショーは開始する。
     console.warn('Audio playback failed:', error);
   }
+  startLyrics();
   scheduleEnding();
 });

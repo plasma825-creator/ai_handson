@@ -10,14 +10,18 @@
   <main class="ending-page">
     <section class="opening-panel" id="startPanel">
       <p class="eyebrow">ESCAPE ENDING</p>
-      <h1>エンディング</h1>
+      <h1>ラク大エンディング</h1>
       <p>MISSION 2 作品集を、金沢国際酪農大学旭台キャンパス唱歌にのせて上映します。</p>
       <button id="startButton" class="start-button" type="button">▶ エンディング開始</button>
-      <p class="note">※音声が流れます。ご注意ください。</p>
+      <p class="note">音声の自動再生を避けるため、開始ボタンを押してください。</p>
     </section>
 
     <section class="stage" id="stage" hidden aria-live="polite">
       <audio id="endingAudio" src="ending/ending_song.mp3" preload="auto"></audio>
+
+      <div class="lyric-overlay" id="lyricOverlay" aria-live="polite">
+        <span id="lyricLine">金沢国際酪農大学旭台キャンパス唱歌</span>
+      </div>
 
       <div class="scene title-scene" id="titleScene">
         <p class="eyebrow">MISSION 2 作品集</p>

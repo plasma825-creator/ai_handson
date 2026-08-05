@@ -2,58 +2,74 @@ const startPanel = document.getElementById('startPanel');
 const stage = document.getElementById('stage');
 const startButton = document.getElementById('startButton');
 const audio = document.getElementById('endingAudio');
+
 const titleScene = document.getElementById('titleScene');
-const slideScene = document.getElementById('slideScene');
+const songCardScene = document.getElementById('songCardScene');
+const posterScene = document.getElementById('posterScene');
+const photoScene = document.getElementById('photoScene');
 const finScene = document.getElementById('finScene');
-const imageGrid = document.getElementById('imageGrid');
-const slideCounter = document.getElementById('slideCounter');
-const slideHeader = document.querySelector('.slide-header');
+
+const posterGrid = document.getElementById('posterGrid');
+const photoStage = document.getElementById('photoStage');
+const posterCounter = document.getElementById('posterCounter');
+const photoCounter = document.getElementById('photoCounter');
 const lyricOverlay = document.getElementById('lyricOverlay');
 const lyricLine = document.getElementById('lyricLine');
 
-const IMAGE_COUNT = 21;
-const GROUP_SIZE = 3;
-const TITLE_MS = 3000;
-const SLIDE_MS = 6000;
-const FIN_MS = 5000;
+const TITLE_AT_MS = 0;
+const SONG_CARD_AT_MS = 17000;
+const POSTER_AT_MS = 32000;
+const PHOTO_AT_MS = 128000;
+const FIN_AT_MS = 159000;
+const AUDIO_STOP_MS = 168000;
+
+const POSTER_MS = 9600;
+const PHOTO_MS = 8500;
 const FADE_MS = 850;
 
-const lyrics = [
-  { time: 0.0, text: '金沢国際酪農大学旭台キャンパス唱歌' },
-  { time: 3.0, text: '旭台に　朝ひらけ' },
-  { time: 6.0, text: '白き峰より　風は来る' },
-  { time: 9.5, text: '酪農の野に　牛は立ち' },
-  { time: 13.0, text: '学びの鐘は　今日も鳴る' },
-  { time: 17.0, text: '重き日々にも　灯をかかげ' },
-  { time: 21.0, text: '知恵をたずねて　道を行く' },
-  { time: 25.0, text: '過ぎしカコクを　越えながら' },
-  { time: 29.0, text: '明日の丘へ　歩み出す' },
-  { time: 33.0, text: 'ああ　金沢国際酪農大学' },
-  { time: 36.0, text: '旭台キャンパス' },
-  { time: 38.5, text: 'われらは進む　ラク大へ' },
-  { time: 41.0, text: 'ラク大へ　いま一歩' },
-  { time: 42.8, text: 'ラク大へ　いま一歩' },
-  { time: 44.6, text: 'ラク大へ　いま一歩' },
+const POSTER_COUNT = 30;
+const PHOTO_COUNT = 3;
+const POSTER_GROUP_SIZE = 3;
 
-  // 歌詞を消すタイミング。必要に応じて 49.5 や 50.5 に調整してください。
-  { time: 50.0, text: '' }
+const lyrics = [
+  { time: 0.0, text: '' },
+  { time: 32.0, text: '旭台に　朝ひらけ' },
+  { time: 40.0, text: '白き峰より　風は来る' },
+  { time: 48.0, text: '酪農の野に　牛は立ち' },
+  { time: 56.0, text: '学びの鐘は　今日も鳴る' },
+  { time: 64.0, text: '重き日々にも　灯をかかげ' },
+  { time: 71.0, text: '知恵をたずねて　道を行く' },
+  { time: 80.0, text: '過ぎしカコクを　越えながら' },
+  { time: 88.0, text: '明日の丘へ　歩み出す' },
+  { time: 98.0, text: 'ああ　金沢国際酪農大学' },
+  { time: 106.0, text: '旭台キャンパス' },
+  { time: 114.0, text: 'われらは進む　ラク大へ' },
+  { time: 128.0, text: 'ラク大へ　いま一歩' },
+  { time: 137.0, text: 'ラク大へ　いま一歩' },
+  { time: 145.0, text: 'ラク大へ　いま一歩' },
+  { time: 159.0, text: '' }
 ];
 
 let currentLyricIndex = -1;
 let lyricRafId = null;
 
-const imagePaths = Array.from({ length: IMAGE_COUNT }, (_, index) => {
-  const num = String(index + 1).padStart(2, '0');
-  return `ending/images/${num}.png`;
-});
+function makePaths(folder, count) {
+  return Array.from({ length: count }, (_, index) => {
+    const num = String(index + 1).padStart(2, '0');
+    return `ending/images/${folder}/${num}.png`;
+  });
+}
 
-const slides = [];
-for (let i = 0; i < imagePaths.length; i += GROUP_SIZE) {
-  slides.push(imagePaths.slice(i, i + GROUP_SIZE));
+const posterPaths = makePaths('posters', POSTER_COUNT);
+const photoPaths = makePaths('photos', PHOTO_COUNT);
+
+const posterSlides = [];
+for (let i = 0; i < posterPaths.length; i += POSTER_GROUP_SIZE) {
+  posterSlides.push(posterPaths.slice(i, i + POSTER_GROUP_SIZE));
 }
 
 function showScene(scene) {
-  [titleScene, slideScene, finScene].forEach(item => {
+  [titleScene, songCardScene, posterScene, photoScene, finScene].forEach(item => {
     item.classList.remove('active');
     if (item !== scene) item.hidden = true;
   });
@@ -62,10 +78,16 @@ function showScene(scene) {
   requestAnimationFrame(() => scene.classList.add('active'));
 }
 
-function renderSlide(index) {
-  const paths = slides[index] || [];
-  imageGrid.innerHTML = '';
-  slideCounter.textContent = `${index + 1} / ${slides.length}`;
+function addMissingMessage(container, path) {
+  container.classList.add('missing');
+  container.textContent = `${path}
+画像を配置してください`;
+}
+
+function renderPosterSlide(index) {
+  const paths = posterSlides[index] || [];
+  posterGrid.innerHTML = '';
+  posterCounter.textContent = `${index + 1} / ${posterSlides.length}`;
 
   paths.forEach((path, slotIndex) => {
     const slot = document.createElement('div');
@@ -74,35 +96,43 @@ function renderSlide(index) {
 
     const img = document.createElement('img');
     img.src = path;
-    img.alt = `MISSION 2 提出画像 ${index * GROUP_SIZE + slotIndex + 1}`;
-
+    img.alt = `MISSION 2 提出画像 ${index * POSTER_GROUP_SIZE + slotIndex + 1}`;
     img.onerror = () => {
-      slot.classList.add('missing');
-      slot.textContent = `${path}\n画像を配置してください`;
+      addMissingMessage(slot, path);
       img.remove();
     };
 
     slot.appendChild(img);
-    imageGrid.appendChild(slot);
+    posterGrid.appendChild(slot);
   });
 }
 
-function transitionToSlide(index) {
-  if (!imageGrid.children.length) {
-    renderSlide(index);
-    return;
-  }
+function renderPhoto(index) {
+  const path = photoPaths[index];
+  photoStage.innerHTML = '';
+  photoCounter.textContent = `${index + 1} / ${photoPaths.length}`;
 
-  imageGrid.classList.add('is-fading');
-  slideHeader.classList.add('is-fading');
+  const slot = document.createElement('div');
+  slot.className = 'photo-slot';
+
+  const img = document.createElement('img');
+  img.src = path;
+  img.alt = `研修中の様子 ${index + 1}`;
+  img.onerror = () => {
+    addMissingMessage(slot, path);
+    img.remove();
+  };
+
+  slot.appendChild(img);
+  photoStage.appendChild(slot);
+}
+
+function fadeAndRun(target, callback) {
+  target.classList.add('is-fading');
 
   setTimeout(() => {
-    renderSlide(index);
-
-    requestAnimationFrame(() => {
-      imageGrid.classList.remove('is-fading');
-      slideHeader.classList.remove('is-fading');
-    });
+    callback();
+    requestAnimationFrame(() => target.classList.remove('is-fading'));
   }, FADE_MS);
 }
 
@@ -129,7 +159,11 @@ function updateLyrics() {
       if (nextText === '') {
         lyricOverlay.classList.remove('show');
         lyricLine.textContent = '';
+        setTimeout(() => {
+          if (lyrics[currentLyricIndex].text === '') lyricOverlay.hidden = true;
+        }, 450);
       } else {
+        lyricOverlay.hidden = false;
         lyricLine.textContent = nextText;
         lyricOverlay.classList.add('show');
       }
@@ -141,12 +175,9 @@ function updateLyrics() {
 
 function startLyrics() {
   currentLyricIndex = -1;
-
-  if (lyricRafId) {
-    cancelAnimationFrame(lyricRafId);
-  }
-
+  if (lyricRafId) cancelAnimationFrame(lyricRafId);
   lyricLine.textContent = '';
+  lyricOverlay.hidden = false;
   lyricOverlay.classList.remove('show');
   updateLyrics();
 }
@@ -158,37 +189,54 @@ function stopLyrics() {
   }
 
   lyricOverlay.classList.remove('show');
-  lyricLine.textContent = '';
+  setTimeout(() => {
+    lyricOverlay.hidden = true;
+    lyricLine.textContent = '';
+  }, 450);
 }
 
 function scheduleEnding() {
   showScene(titleScene);
 
   setTimeout(() => {
-    showScene(slideScene);
-    renderSlide(0);
-  }, TITLE_MS);
+    showScene(songCardScene);
+  }, SONG_CARD_AT_MS);
 
-  slides.forEach((_, index) => {
+  setTimeout(() => {
+    showScene(posterScene);
+    renderPosterSlide(0);
+  }, POSTER_AT_MS);
+
+  posterSlides.forEach((_, index) => {
     if (index === 0) return;
-
     setTimeout(() => {
-      showScene(slideScene);
-      transitionToSlide(index);
-    }, TITLE_MS + SLIDE_MS * index);
+      showScene(posterScene);
+      fadeAndRun(posterGrid, () => renderPosterSlide(index));
+    }, POSTER_AT_MS + POSTER_MS * index);
   });
 
   setTimeout(() => {
-    showScene(finScene);
-  }, TITLE_MS + SLIDE_MS * slides.length);
+    showScene(photoScene);
+    renderPhoto(0);
+  }, PHOTO_AT_MS);
+
+  photoPaths.forEach((_, index) => {
+    if (index === 0) return;
+    setTimeout(() => {
+      showScene(photoScene);
+      fadeAndRun(photoStage, () => renderPhoto(index));
+    }, PHOTO_AT_MS + PHOTO_MS * index);
+  });
 
   setTimeout(() => {
     stopLyrics();
+    showScene(finScene);
+  }, FIN_AT_MS);
 
-    if (!audio.paused) {
-      audio.pause();
-    }
-  }, TITLE_MS + SLIDE_MS * slides.length + FIN_MS + 800);
+  setTimeout(() => {
+    stopLyrics();
+    if (!audio.paused) audio.pause();
+  }, AUDIO_STOP_MS + 800);
 }
 
 startButton.addEventListener('click', async () => {
@@ -199,7 +247,6 @@ startButton.addEventListener('click', async () => {
     audio.currentTime = 0;
     await audio.play();
   } catch (error) {
-    // 音声再生に失敗してもスライドショーは開始する。
     console.warn('Audio playback failed:', error);
   }
 

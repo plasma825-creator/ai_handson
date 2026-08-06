@@ -11,61 +11,47 @@
     <section class="opening-panel" id="startPanel">
       <p class="eyebrow">ESCAPE ENDING</p>
       <h1>ラク大エンディング</h1>
-      <p>MISSION 2 作品集と研修風景を、金沢国際酪農大学旭台キャンパス唱歌にのせて上映します。</p>
+      <p>MISSION 2 作品集を、金沢国際酪農大学旭台キャンパス唱歌にのせて上映します。</p>
       <button id="startButton" class="start-button" type="button">▶ エンディング開始</button>
-      <p class="note">音声の自動再生を避けるため、開始ボタンを押してください。</p>
+      <p class="note">※音声が流れます。ご注意ください。</p>
     </section>
 
     <section class="stage" id="stage" hidden aria-live="polite">
       <audio id="endingAudio" src="ending/ending_song.mp3" preload="auto"></audio>
 
-      <div class="lyric-overlay" id="lyricOverlay" aria-live="polite">
+      <div class="lyric-overlay" id="lyricOverlay" aria-live="polite" hidden>
         <span id="lyricLine"></span>
       </div>
 
       <div class="scene title-scene" id="titleScene">
         <div class="title-card">
-          <p class="eyebrow">MISSION COMPLETE</p>
-          <h2>金沢国際酪農大学<br>旭台キャンパス唱歌</h2>
+          <p class="eyebrow">ENDING THEME</p>
+          <h2>金沢国際酪農大学<br><span>旭台キャンパス唱歌</span></h2>
           <p>カコク大からの脱出</p>
         </div>
       </div>
 
-      <div class="scene song-card-scene" id="songCardScene" hidden>
-        <div class="school-song-card">
-          <div class="song-title">
-            <span>金沢国際酪農大学</span>
-            <span>旭台キャンパス唱歌</span>
-          </div>
-
-          <div class="song-meta">
-            <span>作詞　理事</span>
-            <span>作曲　Ｓｕｎｏ</span>
-          </div>
-
-          <div class="song-lyrics-vertical">
-            <p>旭台に　朝ひらけ<br>白き峰より　風は来る<br>酪農の野に　牛は立ち<br>学びの鐘は　今日も鳴る</p>
-
-            <p>重き日々にも　灯をかかげ<br>知恵をたずねて　道を行く<br>過ぎしカコクを　越えながら<br>明日の丘へ　歩み出す</p>
-
-            <p>ああ　金沢国際酪農大学<br>旭台キャンパス<br>われらは進む　ラク大へ</p>
-
-            <p>ラク大へ　いま一歩<br>ラク大へ　いま一歩<br>ラク大へ　いま一歩</p>
-          </div>
-        </div>
+      <div class="scene songcard-scene" id="songCardScene" hidden>
+        <img
+          class="school-song-card-img"
+          src="ending/images/song_card.png"
+          alt="金沢国際酪農大学 旭台キャンパス唱歌 歌詞カード"
+        >
       </div>
+
+</div>
 
       <div class="scene slide-scene" id="posterScene" hidden>
         <div class="slide-header">
-          <p class="eyebrow">OPEN CAMPUS POSTER VISUALS</p>
-          <p id="posterCounter">1 / 10</p>
+          <p class="eyebrow">MISSION 2 POSTER VISUALS</p>
+          <p id="posterCounter">1 / 11</p>
         </div>
         <div class="image-grid three" id="posterGrid"></div>
       </div>
 
       <div class="scene photo-scene" id="photoScene" hidden>
         <div class="slide-header">
-          <p class="eyebrow">JAIPON REVIEW MEETING</p>
+          <p class="eyebrow">JAIPON</p>
           <p id="photoCounter">1 / 3</p>
         </div>
         <div class="photo-stage" id="photoStage"></div>
